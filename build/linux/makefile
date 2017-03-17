@@ -1,23 +1,19 @@
 NAME 		= long_running_service
-DIR_SRC = $(DIR_SERVICES_ROOT_SRC)/test_long_runner/src
-DIR_INCLUDE = $(DIR_SERVICES_ROOT_SRC)/test_long_runner/include
-CC		= g++
-CXX		= g++
-MAKEDEPEND 	= gcc -MM -MF
+DIR_BUILD :=  $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+DIR_SRC := $(realpath $(DIR_BUILD)/../../src)
+DIR_INCLUDE :=$(realpath $(DIR_BUILD)/../../include)
 
-
-
-ifeq ($(DIR_ROOT),)
-export DIR_ROOT = $(realpath $(../..))
+ifeq ($(DIR_BUILD_CONFIG),)
+export DIR_BUILD_CONFIG := $(realpath $(DIR_BUILD)/../../../../build-config/linux)
 endif
 
-ifneq ($(PROPERTIES_SET),1)
-include $(DIR_BUILD_ROOT)/project.properties
-endif
+include $(DIR_BUILD_CONFIG)/project.properties
 
-export DIR_INSTALL=$(DIR_GRASSROOTS_INSTALL)/services
+VPATH := $(DIR_SRC)
 
-BUILD		= debug
+BUILD		:= debug
+
+export DIR_INSTALL := $(DIR_GRASSROOTS_INSTALL)/services
 
 
 VPATH	= \
@@ -60,5 +56,5 @@ LDFLAGS += -L$(DIR_JANSSON_LIB) -ljansson \
 	-lpthread
 
 
-include $(DIR_BUILD_ROOT)/generic_makefiles/shared_library.makefile
+include $(DIR_BUILD_CONFIG)/generic_makefiles/shared_library.makefile
 
