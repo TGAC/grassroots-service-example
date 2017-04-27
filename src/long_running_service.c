@@ -80,6 +80,8 @@ typedef struct TimedServiceJob
 typedef struct
 {
 	ServiceData lsd_base_data;
+	uint32 lsd_default_number_of_jobs;
+
 } LongRunningServiceData;
 
 
@@ -224,6 +226,7 @@ ServicesArray *GetServices (UserDetails *user_p)
 							
 							* (services_p -> sa_services_pp) = service_p;
 
+
 							/*
 							 * We are going to store the data representing the asynchronous tasks
 							 * in the JobsManager and so we need to specify the callback functions
@@ -263,6 +266,7 @@ static LongRunningServiceData *AllocateLongRunningServiceData (Service * UNUSED_
 
 	if (data_p)
 		{
+			data_p -> lsd_default_number_of_jobs = 3;
 			return data_p;
 		}
 
@@ -347,8 +351,9 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 			 */
 			Parameter *param_p = NULL;
 			SharedType def;
+			LongRunningServiceData *data_p = (LongRunningServiceData *) (service_p -> se_data_p);
 
-			def.st_ulong_value = 3;
+			def.st_ulong_value = data_p -> lsd_default_number_of_jobs;
 
 			if ((param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_type, false, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run", NULL, def, NULL, NULL, PL_ALL, NULL)) != NULL)
 				{
