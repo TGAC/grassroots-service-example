@@ -221,7 +221,7 @@ ServicesArray *GetServices (UserDetails *user_p)
 								CloseLongRunningService,
 								CustomiseTimedServiceJob,
 								true,
-								false,
+								SY_ASYNCHRONOUS_DETACHED,
 								data_p);
 							
 							* (services_p -> sa_services_pp) = service_p;
