@@ -518,8 +518,10 @@ static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *p
 						{
 							StartTimedServiceJob (job_p);
 
-							job_p -> tsj_job.sj_status = GetTimedServiceJobStatus ((ServiceJob *) job_p);
+							SetServiceJobStatus (& (job_p -> tsj_job), GetTimedServiceJobStatus ((ServiceJob *) job_p));
+
 							job_p -> tsj_added_flag = true;
+
 
 							if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> tsj_job.sj_id, (ServiceJob *) job_p))
 								{
@@ -587,7 +589,8 @@ static void StartTimedServiceJob (TimedServiceJob *job_p)
 
 	time (& (ti_p -> ti_start));
 	ti_p -> ti_end = (ti_p -> ti_start) + (ti_p -> ti_duration);
-	job_p -> tsj_job.sj_status = OS_STARTED;
+
+	SetServiceJobStatus (& (job_p -> tsj_job), OS_STARTED);
 }
 
 
@@ -619,7 +622,7 @@ static OperationStatus GetTimedServiceJobStatus (ServiceJob *job_p)
 				}
 		}
 
-	job_p -> sj_status = status;
+	SetServiceJobStatus (job_p, status);
 
 	return status;
 }
