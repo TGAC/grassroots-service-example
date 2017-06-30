@@ -692,7 +692,7 @@ static json_t *GetTimedServiceJobAsJSON (TimedServiceJob *job_p)
 	/*
 	 * Get the JSON for the ServiceJob base class.
 	 */
-	json_t *json_p = GetServiceJobAsJSON (& (job_p -> tsj_job));
+	json_t *json_p = GetServiceJobAsJSON (& (job_p -> tsj_job), false);
 
 	if (json_p)
 		{
