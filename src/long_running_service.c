@@ -681,8 +681,7 @@ static void FreeTimedServiceJob (ServiceJob *job_p)
 			FreeMemory (timed_job_p -> tsj_interval_p);
 		}
 
-	ClearServiceJob (job_p);
-	FreeMemory (timed_job_p);
+	FreeBaseServiceJob (job_p);
 }
 
 
