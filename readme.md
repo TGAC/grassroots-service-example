@@ -1,4 +1,4 @@
-﻿# Example service
+﻿# Example service {#example_service}
 
 The example service is for showing developers techniques used for building a service. It shows how to run long running jobs asynchronously and how to access and query from multiple requests and processes.
 
@@ -12,15 +12,21 @@ The files to build the SamTools service are in the ```build/<platform>``` direct
 
 If you enter this directory 
 
-```cd build/linux```
+```
+cd build/linux
+```
 
 you can then build the service by typing
 
-```make all```
+```
+make all
+```
 
 and then 
 
-```make install```
+```
+make install
+```
 
 to install the service into the Grassroots system where it will be available for use immediately.
 
