@@ -41,6 +41,13 @@
 	 * requests. It mimics real world jobs by running a user-specified number of jobs that
 	 * are have a start and end times, each one an equivalent to a stopwatch.
 	 */
+
+
+/**
+ * @file
+ * @defgroup example_service The Example Services Module
+ * @brief
+ */
 /**
  * @privatesection
  * @{
@@ -71,10 +78,24 @@ extern "C"
 #endif
 
 
-
+/**
+ * Get the ServicesArray containing the example Service.
+ *
+ * @param user_p The UserDetails for the user trying to access the services.
+ * This can be <code>NULL</code>.
+ * @return The ServicesArray containing all of the example Service or
+ * <code>NULL</code> upon error.
+ * @ingroup example_service
+ */
 LONG_RUNNING_SERVICE_API ServicesArray *GetServices (UserDetails *user_p);
 
 
+/**
+ * Free the ServicesArray containing the example Service.
+ *
+ * @param services_p The ServicesArray to free.
+ * @ingroup example_service
+ */
 LONG_RUNNING_SERVICE_API void ReleaseServices (ServicesArray *services_p);
 
 #ifdef __cplusplus
