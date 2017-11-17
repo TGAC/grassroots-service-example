@@ -172,18 +172,19 @@ static json_t *GetTimedServiceJobAsJSON (TimedServiceJob *job_p);
 static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p);
 
 
-
 static ServiceJob *BuildTimedServiceJob (Service *service_p, const json_t *service_job_json_p);
 
 
-static json_t *BuildTimedServiceJobJSON ( Service *service_p, ServiceJob *service_job_p);
+static json_t *BuildTimedServiceJobJSON (Service *service_p, ServiceJob *service_job_p, bool omit_results_flag);
 
 
 static void CustomiseTimedServiceJob (Service *service_p, ServiceJob *job_p);
 
 
-
 static bool UpdateTimedServiceJob (struct ServiceJob *job_p);
+
+
+static ServiceMetadata *GetLongRunningServiceMetadata (Service *service_p);
 
 
 /*
@@ -210,7 +211,7 @@ ServicesArray *GetServices (UserDetails *user_p)
 							/*
 							 * Set up our Service structure and ServiceData.
 							 */
-							InitialiseService (service_p,
+							if (InitialiseService (service_p,
 								GetLongRunningServiceName,
 								GetLongRunningServiceDesciption,
 								NULL,
@@ -222,21 +223,23 @@ ServicesArray *GetServices (UserDetails *user_p)
 								CustomiseTimedServiceJob,
 								true,
 								SY_ASYNCHRONOUS_DETACHED,
-								data_p);
-							
-							* (services_p -> sa_services_pp) = service_p;
+								data_p,
+								GetLongRunningServiceMetadata))
+								{
+									* (services_p -> sa_services_pp) = service_p;
 
 
-							/*
-							 * We are going to store the data representing the asynchronous tasks
-							 * in the JobsManager and so we need to specify the callback functions
-							 * that we will use to convert our ServiceJobs to and from their JSON
-							 * representations.
-							 */
-							service_p -> se_deserialise_job_json_fn = BuildTimedServiceJob;
-							service_p -> se_serialise_job_json_fn = BuildTimedServiceJobJSON;
+									/*
+									 * We are going to store the data representing the asynchronous tasks
+									 * in the JobsManager and so we need to specify the callback functions
+									 * that we will use to convert our ServiceJobs to and from their JSON
+									 * representations.
+									 */
+									service_p -> se_deserialise_job_json_fn = BuildTimedServiceJob;
+									service_p -> se_serialise_job_json_fn = BuildTimedServiceJobJSON;
 
-							return services_p;
+									return services_p;
+								}
 						}
 
 					FreeServicesArray (services_p);
@@ -884,7 +887,7 @@ static ServiceJob *BuildTimedServiceJob (Service *service_p, const json_t *servi
 }
 
 
-static json_t *BuildTimedServiceJobJSON (Service *service_p, ServiceJob *service_job_p)
+static json_t *BuildTimedServiceJobJSON (Service *service_p, ServiceJob *service_job_p, bool omit_results_flag)
 {
 	return GetTimedServiceJobAsJSON ((TimedServiceJob *) service_job_p);
 }
@@ -896,3 +899,34 @@ static void CustomiseTimedServiceJob (Service *service_p, ServiceJob *job_p)
 	job_p -> sj_update_fn = NULL;
 	job_p -> sj_free_fn = NULL;
 }
+
+
+
+static ServiceMetadata *GetLongRunningServiceMetadata (Service *service_p)
+{
+	const char *term_url_s = CONTEXT_PREFIX_EDAM_ONTOLOGY_S "operation_0304";
+	SchemaTerm *category_p = AllocateSchemaTerm (term_url_s, "Query and retrieval", "Search or query a data resource and retrieve entries and / or annotation.");
+
+	if (category_p)
+		{
+			ServiceMetadata *metadata_p = AllocateServiceMetadata (category_p, NULL);
+
+			if (metadata_p)
+				{
+					return metadata_p;
+				}		/* if (metadata_p) */
+			else
+				{
+					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate service metadata");
+				}
+
+
+		}		/* if (category_p) */
+	else
+		{
+			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate category term %s for service metadata", term_url_s);
+		}
+
+	return NULL;
+}
+
