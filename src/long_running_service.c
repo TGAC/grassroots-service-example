@@ -920,7 +920,7 @@ static ServiceMetadata *GetLongRunningServiceMetadata (Service *service_p)
 					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to allocate service metadata");
 				}
 
-
+			FreeSchemaTerm (category_p);
 		}		/* if (category_p) */
 	else
 		{
