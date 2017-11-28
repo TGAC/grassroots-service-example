@@ -459,11 +459,11 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 
 					if (job_p)
 						{
-							if (AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p))
+							if (AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
 								{
 									++ i;
 									loop_flag = (i < num_jobs);
-								}		/* if (AddServiceJobToServiceJobSet (jobs_p, (ServiceJob *) job_p)) */
+								}		/* if (AddServiceJobToService (service_p, (ServiceJob *) job_p)) */
 							else
 								{
 									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add TimedServiceJob to ServiceJobSet");
