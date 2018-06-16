@@ -95,6 +95,10 @@ typedef struct
  * keys shown below.
  */
 
+
+static const char * const LRS_SERVICE_JOB_TYPE_S = "long running service job";
+
+
 /* This is the key used to specify the start time of the task. */
 static const char * const LRS_START_S = "start";
 
@@ -656,7 +660,7 @@ static TimedServiceJob *AllocateTimedServiceJob (Service *service_p, const char 
 					job_p -> tsj_interval_p = interval_p;
 					job_p -> tsj_added_flag = false;
 
-					InitServiceJob (& (job_p -> tsj_job), service_p, job_name_s, job_description_s, UpdateTimedServiceJob, NULL, FreeTimedServiceJob, NULL);
+					InitServiceJob (& (job_p -> tsj_job), service_p, job_name_s, job_description_s, UpdateTimedServiceJob, NULL, FreeTimedServiceJob, NULL, LRS_SERVICE_JOB_TYPE_S);
 
 				}		/* if (job_p) */
 			else
