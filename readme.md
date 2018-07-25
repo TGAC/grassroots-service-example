@@ -1,4 +1,4 @@
-﻿# Example service {#example_service}
+﻿# Example service {#example_service_guide}
 
 The example service is for showing developers techniques used for building a service. It shows how to run long running jobs asynchronously and how to access and query from multiple requests and processes.
 
