@@ -139,6 +139,9 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 
 static void ReleaseLongRunningServiceParameters (Service *service_p, ParameterSet *params_p);
 
+static bool GetLongRunningServiceParameterTypesForNamedParameters (struct Service *service_p, const char *param_name_s, ParameterType *pt_p);
+
+
 static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
 static ParameterSet *IsFileForLongRunningService (Service *service_p, Resource *resource_p, Handler *handler_p);
@@ -222,6 +225,7 @@ ServicesArray *GetServices (UserDetails *user_p)
 								RunLongRunningService,
 								IsFileForLongRunningService,
 								GetLongRunningServiceParameters,
+								GetLongRunningServiceParameterTypesForNamedParameters,
 								ReleaseLongRunningServiceParameters,
 								CloseLongRunningService,
 								CustomiseTimedServiceJob,
@@ -373,6 +377,19 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 	return NULL;
 }
 
+
+static bool GetLongRunningServiceParameterTypesForNamedParameters (struct Service *service_p, const char *param_name_s, ParameterType *pt_p)
+{
+	bool success_flag = false;
+
+	if (strcmp (param_name_s, LRS_NUMBER_OF_JOBS.npt_name_s) == 0)
+		{
+			*pt_p = LRS_NUMBER_OF_JOBS.npt_type;
+			success_flag = true;
+		}
+
+	return success_flag;
+}
 
 static void ReleaseLongRunningServiceParameters (Service * UNUSED_PARAM (service_p), ParameterSet *params_p)
 {
