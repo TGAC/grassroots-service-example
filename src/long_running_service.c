@@ -366,7 +366,7 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 
 			def.st_ulong_value = data_p -> lsd_default_number_of_jobs;
 
-			if ((param_p = CreateAndAddParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_type, false, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run", NULL, def, NULL, NULL, PL_ALL, NULL)) != NULL)
+			if ((param_p = EasyCreateAndAddParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_type, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run", NULL, def, PL_ALL)) != NULL)
 				{
 					return param_set_p;
 				}
