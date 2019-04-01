@@ -232,7 +232,8 @@ ServicesArray *GetServices (UserDetails *user_p)
 								true,
 								SY_ASYNCHRONOUS_DETACHED,
 								data_p,
-								GetLongRunningServiceMetadata))
+								GetLongRunningServiceMetadata,
+								NULL))
 								{
 									* (services_p -> sa_services_pp) = service_p;
 
