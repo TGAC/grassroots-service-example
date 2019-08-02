@@ -398,11 +398,13 @@ static void ReleaseLongRunningServiceParameters (Service * UNUSED_PARAM (service
 }
 
 
-static json_t *GetLongRunningResultsAsJSON (Service * UNUSED_PARAM (service_p), const uuid_t job_id)
+static json_t *GetLongRunningResultsAsJSON (Service *service_p, const uuid_t job_id)
 {
-	JobsManager *jobs_mananger_p = GetJobsManager ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+	JobsManager *jobs_mananger_p = GetJobsManager (grassroots_p);
 	TimedServiceJob *job_p = (TimedServiceJob *) GetServiceJobFromJobsManager (jobs_mananger_p, job_id);
 	json_t *results_array_p = NULL;
+
 
 	if (job_p)
 		{
@@ -529,7 +531,8 @@ static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *p
 			if (service_p -> se_jobs_p)
 				{
 					ServiceJobSetIterator iterator;
-					JobsManager *jobs_manager_p = GetJobsManager ();
+					GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+					JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 					TimedServiceJob *job_p = NULL;
 					uint32 i = 0;
 					bool loop_flag;
@@ -586,10 +589,11 @@ static ParameterSet *IsFileForLongRunningService (Service * UNUSED_PARAM (servic
 }
 
 
-static OperationStatus GetLongRunningServiceStatus (Service * UNUSED_PARAM (service_p), const uuid_t job_id)
+static OperationStatus GetLongRunningServiceStatus (Service *service_p, const uuid_t job_id)
 {
 	OperationStatus status = OS_ERROR;
-	JobsManager *jobs_manager_p = GetJobsManager ();
+	GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+	JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 	ServiceJob *job_p = GetServiceJobFromJobsManager (jobs_manager_p, job_id);
 
 	if (job_p)
@@ -862,7 +866,9 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p)
 
 													if (new_status != old_status)
 														{
-															RemoveServiceJobFromJobsManager (GetJobsManager (), job_p -> tsj_job.sj_id, false);
+															GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (job_p -> tsj_job.sj_service_p);
+															JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
+															RemoveServiceJobFromJobsManager (jobs_manager_p, job_p -> tsj_job.sj_id, false);
 														}
 												}
 
