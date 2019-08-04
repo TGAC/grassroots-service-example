@@ -87,7 +87,7 @@ extern "C"
  * <code>NULL</code> upon error.
  * @ingroup example_service
  */
-LONG_RUNNING_SERVICE_API ServicesArray *GetServices (UserDetails *user_p);
+LONG_RUNNING_SERVICE_API ServicesArray *GetServices (UserDetails *user_p, GrassrootsServer *grassroots_p);
 
 
 /**
