@@ -154,10 +154,6 @@ static OperationStatus GetLongRunningServiceStatus (Service *service_p, const uu
 
 static unsigned char *SerialiseTimedServiceJob (ServiceJob *job_p, unsigned int *value_length_p);
 
-
-static ServiceJob *DeserialiseTimedServiceJob (unsigned char *data_p, void *config_p);
-
-
 static void StartTimedServiceJob (TimedServiceJob *job_p);
 
 
@@ -176,7 +172,7 @@ static void FreeTimedServiceJob (ServiceJob *job_p);
 static json_t *GetTimedServiceJobAsJSON (TimedServiceJob *job_p);
 
 
-static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p);
+static TimedServiceJob *GetTimedServiceJobFromJSON (Service *service_p, const json_t *json_p);
 
 
 static ServiceJob *BuildTimedServiceJob (Service *service_p, const json_t *service_job_json_p);
@@ -759,30 +755,6 @@ static json_t *GetTimedServiceJobAsJSON (TimedServiceJob *job_p)
 
 
 
-static ServiceJob *DeserialiseTimedServiceJob (unsigned char *data_p, void * UNUSED_PARAM (config_p))
-{
-	TimedServiceJob *job_p = NULL;
-	json_error_t err;
-	json_t *job_json_p = json_loads ((char *) data_p, 0, &err);
-
-	if (job_json_p)
-		{
-			job_p = GetTimedServiceJobFromJSON (job_json_p);
-
-			if (!job_p)
-				{
-					PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "GetTimedServiceJobFromJSON failed for \"%s\"", data_p);
-				}
-
-		}		/* if (job_json_p) */
-	else
-		{
-			PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to convert \"%s\" to json, err \"%s\" at line %d, column %d", data_p, err.text, err.line, err.column);
-		}
-
-	return ((ServiceJob *) job_p);
-}
-
 
 static unsigned char *SerialiseTimedServiceJob (ServiceJob *base_job_p, unsigned int *value_length_p)
 {
@@ -825,7 +797,7 @@ static unsigned char *SerialiseTimedServiceJob (ServiceJob *base_job_p, unsigned
 }
 
 
-static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p)
+static TimedServiceJob *GetTimedServiceJobFromJSON (Service *service_p, const json_t *json_p)
 {
 	/* allocate the memory for the TimedServiceJob */
 	TimedServiceJob *job_p = (TimedServiceJob *) AllocMemory (sizeof (TimedServiceJob));
@@ -837,6 +809,8 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p)
 
 			if (job_p -> tsj_interval_p)
 				{
+					job_p -> tsj_job.sj_service_p = service_p;
+
 					/* initialise the base ServiceJob from the JSON fragment */
 					if (InitServiceJobFromJSON (& (job_p -> tsj_job), json_p))
 						{
@@ -912,7 +886,7 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (const json_t *json_p)
 
 static ServiceJob *BuildTimedServiceJob (Service *service_p, const json_t *service_job_json_p)
 {
-	return ((ServiceJob* ) GetTimedServiceJobFromJSON (service_job_json_p));
+	return ((ServiceJob* ) GetTimedServiceJobFromJSON (service_p, service_job_json_p));
 }
 
 
