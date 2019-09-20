@@ -809,10 +809,12 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (Service *service_p, const js
 
 			if (job_p -> tsj_interval_p)
 				{
+					GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+
 					job_p -> tsj_job.sj_service_p = service_p;
 
 					/* initialise the base ServiceJob from the JSON fragment */
-					if (InitServiceJobFromJSON (& (job_p -> tsj_job), json_p))
+					if (InitServiceJobFromJSON (& (job_p -> tsj_job), json_p, grassroots_p))
 						{
 							/*
 							 * We now need to get the start and end times for the TimeInterval
