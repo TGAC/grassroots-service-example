@@ -843,7 +843,6 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (Service *service_p, const js
 
 													if (new_status != old_status)
 														{
-															GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (job_p -> tsj_job.sj_service_p);
 															JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 															RemoveServiceJobFromJobsManager (jobs_manager_p, job_p -> tsj_job.sj_id, false);
 														}
