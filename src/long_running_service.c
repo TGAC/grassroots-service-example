@@ -22,6 +22,7 @@
 #include "jobs_manager.h"
 #include "service_job_set_iterator.h"
 
+#include "unsigned_int_parameter.h"
 
 /*
  * This service is an example to show how job data can be persisted between separate
@@ -359,12 +360,9 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 			 * We will have a single parameter specifying the number of jobs to run.
 			 */
 			Parameter *param_p = NULL;
-			SharedType def;
 			LongRunningServiceData *data_p = (LongRunningServiceData *) (service_p -> se_data_p);
 
-			def.st_ulong_value = data_p -> lsd_default_number_of_jobs;
-
-			if ((param_p = EasyCreateAndAddParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_type, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run",  def, PL_ALL)) != NULL)
+			if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run",  & (data_p -> lsd_default_number_of_jobs), PL_ALL)) != NULL)
 				{
 					return param_set_p;
 				}
@@ -515,63 +513,67 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 
 static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails * UNUSED_PARAM (user_p), ProvidersStateTable * UNUSED_PARAM (providers_p))
 {
-	SharedType param_value;
+	const uint32 *num_tasks_p = NULL;
 
-	InitSharedType (&param_value);
-
-	if (GetParameterValueFromParameterSet (param_set_p, LRS_NUMBER_OF_JOBS.npt_name_s, &param_value, true))
+	if (GetCurrentUnsignedIntParameterValueFromParameterSet (param_set_p, LRS_NUMBER_OF_JOBS.npt_name_s, &num_tasks_p))
 		{
-			const uint32 num_tasks = param_value.st_ulong_value;
-
-			service_p -> se_jobs_p = GetServiceJobSet (service_p, num_tasks);
-
-			if (service_p -> se_jobs_p)
+			if (num_tasks_p != NULL)
 				{
-					ServiceJobSetIterator iterator;
-					GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
-					JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
-					TimedServiceJob *job_p = NULL;
-					uint32 i = 0;
-					bool loop_flag;
-
-					InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
-					job_p = (TimedServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
-
-					loop_flag = (job_p != NULL);
-
-					while (loop_flag)
+					if (*num_tasks_p > 0)
 						{
-							StartTimedServiceJob (job_p);
+							service_p -> se_jobs_p = GetServiceJobSet (service_p, *num_tasks_p);
 
-							SetServiceJobStatus (& (job_p -> tsj_job), GetTimedServiceJobStatus ((ServiceJob *) job_p));
-
-							job_p -> tsj_added_flag = true;
-
-
-							if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> tsj_job.sj_id, (ServiceJob *) job_p))
+							if (service_p -> se_jobs_p)
 								{
-									char job_id_s [UUID_STRING_BUFFER_SIZE];
+									ServiceJobSetIterator iterator;
+									GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
+									JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
+									TimedServiceJob *job_p = NULL;
+									uint32 i = 0;
+									bool loop_flag;
 
-									ConvertUUIDToString (job_p -> tsj_job.sj_id, job_id_s);
-									PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+									InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
+									job_p = (TimedServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
 
-									job_p -> tsj_added_flag = false;
-								}
+									loop_flag = (job_p != NULL);
 
-							job_p = (TimedServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
+									while (loop_flag)
+										{
+											StartTimedServiceJob (job_p);
 
-							if (job_p)
-								{
-									++ i;
-								}
-							else
-								{
-									loop_flag = false;
-								}
+											SetServiceJobStatus (& (job_p -> tsj_job), GetTimedServiceJobStatus ((ServiceJob *) job_p));
 
-						}		/* while (loop_flag) */
+											job_p -> tsj_added_flag = true;
 
-				}		/* if (service_p -> se_jobs_p) */
+
+											if (!AddServiceJobToJobsManager (jobs_manager_p, job_p -> tsj_job.sj_id, (ServiceJob *) job_p))
+												{
+													char job_id_s [UUID_STRING_BUFFER_SIZE];
+
+													ConvertUUIDToString (job_p -> tsj_job.sj_id, job_id_s);
+													PrintErrors (STM_LEVEL_SEVERE, __FILE__, __LINE__, "Failed to add job \"%s\" to JobsManager", job_id_s);
+
+													job_p -> tsj_added_flag = false;
+												}
+
+											job_p = (TimedServiceJob *) GetNextServiceJobFromServiceJobSetIterator (&iterator);
+
+											if (job_p)
+												{
+													++ i;
+												}
+											else
+												{
+													loop_flag = false;
+												}
+
+										}		/* while (loop_flag) */
+
+								}		/* if (service_p -> se_jobs_p) */
+
+						}
+				}
+
 
 		}		/* if (GetParameterValueFromParameterSet (param_set_p, TAG_LONG_RUNNING_NUM_JOBS, &param_value, true)) */
 
