@@ -132,15 +132,15 @@ static LongRunningServiceData *AllocateLongRunningServiceData (Service *service_
 
 static void FreeLongRunningServiceData (LongRunningServiceData *data_p);
 
-static const char *GetLongRunningServiceName (Service *service_p);
+static const char *GetLongRunningServiceName (const Service *service_p);
 
-static const char *GetLongRunningServiceDesciption (Service *service_p);
+static const char *GetLongRunningServiceDesciption (const Service *service_p);
 
 static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
 static void ReleaseLongRunningServiceParameters (Service *service_p, ParameterSet *params_p);
 
-static bool GetLongRunningServiceParameterTypesForNamedParameters (struct Service *service_p, const char *param_name_s, ParameterType *pt_p);
+static bool GetLongRunningServiceParameterTypesForNamedParameters (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
 static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
@@ -338,13 +338,13 @@ static bool CloseLongRunningService (Service *service_p)
 }
  
  
-static const char *GetLongRunningServiceName (Service * UNUSED_PARAM (service_p))
+static const char *GetLongRunningServiceName (const Service * UNUSED_PARAM (service_p))
 {
 	return "Long Running service";
 }
 
 
-static const char *GetLongRunningServiceDesciption (Service * UNUSED_PARAM (service_p))
+static const char *GetLongRunningServiceDesciption (const Service * UNUSED_PARAM (service_p))
 {
 	return "A service to test long-running asynchronous services";
 }
@@ -374,7 +374,7 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 }
 
 
-static bool GetLongRunningServiceParameterTypesForNamedParameters (struct Service *service_p, const char *param_name_s, ParameterType *pt_p)
+static bool GetLongRunningServiceParameterTypesForNamedParameters (const Service *service_p, const char *param_name_s, ParameterType *pt_p)
 {
 	bool success_flag = false;
 
