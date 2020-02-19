@@ -22,6 +22,7 @@
 #include "jobs_manager.h"
 #include "service_job_set_iterator.h"
 
+#include "signed_int_parameter.h"
 #include "unsigned_int_parameter.h"
 
 /*
@@ -117,7 +118,9 @@ static const char * const LRS_ADDED_FLAG_S = "added_to_job_manager";
  * We will have a single parameter that specifies how many tasks we want to
  * simulate.
  */
-static NamedParameterType LRS_NUMBER_OF_JOBS = { "Number of Jobs", PT_UNSIGNED_INT };
+static NamedParameterType LRS_NUMBER_OF_JOBS = { "Number of Jobs", PT_SIGNED_INT };
+
+static NamedParameterType LRS_MIN_DURATION = { "Minimum duration of each job", PT_SIGNED_INT };
 
 
 /*
@@ -161,7 +164,7 @@ static void StartTimedServiceJob (TimedServiceJob *job_p);
 static OperationStatus GetTimedServiceJobStatus (ServiceJob *job_p);
 
 
-static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_jobs);
+static ServiceJobSet *GetServiceJobSet (Service *service_p, const int32 num_jobs, const int32 min_duration);
 
 
 static TimedServiceJob *AllocateTimedServiceJob (Service *service_p, const char * const job_name_s, const char * const job_description_s, const time_t duration);
@@ -362,9 +365,14 @@ static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resour
 			Parameter *param_p = NULL;
 			LongRunningServiceData *data_p = (LongRunningServiceData *) (service_p -> se_data_p);
 
-			if ((param_p = EasyCreateAndAddUnsignedIntParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run",  & (data_p -> lsd_default_number_of_jobs), PL_ALL)) != NULL)
+			if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_NUMBER_OF_JOBS.npt_type, LRS_NUMBER_OF_JOBS.npt_name_s, "Number of jobs", "Number of jobs to run",  & (data_p -> lsd_default_number_of_jobs), PL_ALL)) != NULL)
 				{
-					return param_set_p;
+					param_p -> pa_required_flag = true;
+
+					if ((param_p = EasyCreateAndAddSignedIntParameterToParameterSet (service_p -> se_data_p, param_set_p, NULL, LRS_MIN_DURATION.npt_type, LRS_MIN_DURATION.npt_name_s, "Minimum time", "Minimum duration of each job",  NULL, PL_ALL)) != NULL)
+						{
+							return param_set_p;
+						}
 				}
 
 			FreeParameterSet (param_set_p);
@@ -381,6 +389,11 @@ static bool GetLongRunningServiceParameterTypesForNamedParameters (const Service
 	if (strcmp (param_name_s, LRS_NUMBER_OF_JOBS.npt_name_s) == 0)
 		{
 			*pt_p = LRS_NUMBER_OF_JOBS.npt_type;
+			success_flag = true;
+		}
+	else if (strcmp (param_name_s, LRS_MIN_DURATION.npt_name_s) == 0)
+		{
+			*pt_p = LRS_MIN_DURATION.npt_type;
 			success_flag = true;
 		}
 
@@ -445,7 +458,7 @@ static json_t *GetLongRunningResultsAsJSON (Service *service_p, const uuid_t job
 /*
  * This is where we create our TimedServiceJob structures prior to running the Service.
  */
-static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_jobs)
+static ServiceJobSet *GetServiceJobSet (Service *service_p, const int32 num_jobs, const int32 min_duration)
 {
 	/*
 	 * If we were just runnig a single generic ServiceJob, we could use the
@@ -469,7 +482,7 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 					/*
 					 * Get a duration for our task that is between 1 and 60 seconds.
 					 */
-					const int duration = 1 + (rand () % 60);
+					const int duration = min_duration + (rand () % 60);
 
 					sprintf (job_name_s, "job " INT32_FMT, i);
 					sprintf (job_description_s, "duration " SIZET_FMT, (size_t) duration);
@@ -513,15 +526,19 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 
 static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails * UNUSED_PARAM (user_p), ProvidersStateTable * UNUSED_PARAM (providers_p))
 {
-	const uint32 *num_tasks_p = NULL;
+	const int32 *num_tasks_p = NULL;
 
-	if (GetCurrentUnsignedIntParameterValueFromParameterSet (param_set_p, LRS_NUMBER_OF_JOBS.npt_name_s, &num_tasks_p))
+	if (GetCurrentSignedIntParameterValueFromParameterSet (param_set_p, LRS_NUMBER_OF_JOBS.npt_name_s, &num_tasks_p))
 		{
 			if (num_tasks_p != NULL)
 				{
 					if (*num_tasks_p > 0)
 						{
-							service_p -> se_jobs_p = GetServiceJobSet (service_p, *num_tasks_p);
+							const int32 *min_duration_p = NULL;
+
+							GetCurrentSignedIntParameterValueFromParameterSet (param_set_p, LRS_MIN_DURATION.npt_name_s, &min_duration_p);
+
+							service_p -> se_jobs_p = GetServiceJobSet (service_p, *num_tasks_p, min_duration_p ? *min_duration_p : 1);
 
 							if (service_p -> se_jobs_p)
 								{
@@ -529,7 +546,7 @@ static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *p
 									GrassrootsServer *grassroots_p = GetGrassrootsServerFromService (service_p);
 									JobsManager *jobs_manager_p = GetJobsManager (grassroots_p);
 									TimedServiceJob *job_p = NULL;
-									uint32 i = 0;
+									int32 i = 0;
 									bool loop_flag;
 
 									InitServiceJobSetIterator (&iterator, service_p -> se_jobs_p);
