@@ -122,7 +122,6 @@ static NamedParameterType LRS_NUMBER_OF_JOBS = { "Number of Jobs", PT_UNSIGNED_I
 
 static NamedParameterType LRS_MIN_DURATION = { "Minimum duration of each job", PT_SIGNED_INT };
 
-
 /*
  * STATIC PROTOTYPES
  * =================
