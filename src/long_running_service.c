@@ -136,7 +136,9 @@ static void FreeLongRunningServiceData (LongRunningServiceData *data_p);
 
 static const char *GetLongRunningServiceName (const Service *service_p);
 
-static const char *GetLongRunningServiceDesciption (const Service *service_p);
+static const char *GetLongRunningServiceAlias (const Service *service_p);
+
+static const char *GetLongRunningServiceDescription (const Service *service_p);
 
 static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
 
@@ -219,7 +221,8 @@ ServicesArray *GetServices (UserDetails *user_p, GrassrootsServer *grassroots_p)
 							 */
 							if (InitialiseService (service_p,
 								GetLongRunningServiceName,
-								GetLongRunningServiceDesciption,
+								GetLongRunningServiceDescription,
+								GetLongRunningServiceAlias,
 								NULL,
 								RunLongRunningService,
 								IsFileForLongRunningService,
@@ -346,11 +349,16 @@ static const char *GetLongRunningServiceName (const Service * UNUSED_PARAM (serv
 }
 
 
-static const char *GetLongRunningServiceDesciption (const Service * UNUSED_PARAM (service_p))
+static const char *GetLongRunningServiceDescription (const Service * UNUSED_PARAM (service_p))
 {
 	return "A service to test long-running asynchronous services";
 }
 
+
+static const char *GetLongRunningServiceAlias (const Service * UNUSED_PARAM (service_p))
+{
+	return "example_service";
+}
 
 static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
