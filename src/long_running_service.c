@@ -118,9 +118,9 @@ static const char * const LRS_ADDED_FLAG_S = "added_to_job_manager";
  * We will have a single parameter that specifies how many tasks we want to
  * simulate.
  */
-static NamedParameterType LRS_NUMBER_OF_JOBS = { "Number of Jobs", PT_UNSIGNED_INT };
-
 static NamedParameterType LRS_MIN_DURATION = { "Minimum duration of each job", PT_SIGNED_INT };
+
+static NamedParameterType LRS_NUMBER_OF_JOBS = { "Number of Jobs", PT_UNSIGNED_INT };
 
 /*
  * STATIC PROTOTYPES
@@ -357,7 +357,7 @@ static const char *GetLongRunningServiceDescription (const Service * UNUSED_PARA
 
 static const char *GetLongRunningServiceAlias (const Service * UNUSED_PARAM (service_p))
 {
-	return "example_service";
+	return "example/run";
 }
 
 static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
