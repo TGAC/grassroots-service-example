@@ -357,7 +357,7 @@ static const char *GetLongRunningServiceDescription (const Service * UNUSED_PARA
 
 static const char *GetLongRunningServiceAlias (const Service * UNUSED_PARAM (service_p))
 {
-	return "example/run";
+	return "example" SERVICE_GROUP_ALIAS_SEPARATOR "run";
 }
 
 static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
