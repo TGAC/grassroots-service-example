@@ -498,7 +498,7 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 
 					if (job_p)
 						{
-							if (AddServiceJobToService (service_p, (ServiceJob *) job_p, false))
+							if (AddServiceJobToService (service_p, (ServiceJob *) job_p))
 								{
 									++ i;
 									loop_flag = (i < num_jobs);
@@ -840,7 +840,7 @@ static TimedServiceJob *GetTimedServiceJobFromJSON (Service *service_p, const js
 					job_p -> tsj_job.sj_service_p = service_p;
 
 					/* initialise the base ServiceJob from the JSON fragment */
-					if (InitServiceJobFromJSON (& (job_p -> tsj_job), json_p, grassroots_p))
+					if (InitServiceJobFromJSON (& (job_p -> tsj_job), json_p, service_p, grassroots_p))
 						{
 							/*
 							 * We now need to get the start and end times for the TimeInterval
