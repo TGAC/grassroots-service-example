@@ -25,6 +25,8 @@
 #include "signed_int_parameter.h"
 #include "unsigned_int_parameter.h"
 
+#include "uuid_util.h"
+
 /*
  * This service is an example to show how job data can be persisted between separate
  * requests. It mimics real world jobs by running a user-specified number of jobs that
