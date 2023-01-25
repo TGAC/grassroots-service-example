@@ -142,7 +142,7 @@ static const char *GetLongRunningServiceAlias (const Service *service_p);
 
 static const char *GetLongRunningServiceDescription (const Service *service_p);
 
-static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource *resource_p, UserDetails *user_p);
+static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
 
 static void ReleaseLongRunningServiceParameters (Service *service_p, ParameterSet *params_p);
 
@@ -151,7 +151,7 @@ static bool GetLongRunningServiceParameterTypesForNamedParameters (const Service
 
 static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
 
-static ParameterSet *IsFileForLongRunningService (Service *service_p, Resource *resource_p, Handler *handler_p);
+static ParameterSet *IsFileForLongRunningService (Service *service_p, DataResource *resource_p, Handler *handler_p);
 
 static bool CloseLongRunningService (Service *service_p);
 
@@ -362,7 +362,7 @@ static const char *GetLongRunningServiceAlias (const Service * UNUSED_PARAM (ser
 	return "example" SERVICE_GROUP_ALIAS_SEPARATOR "run";
 }
 
-static ParameterSet *GetLongRunningServiceParameters (Service *service_p, Resource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("LongRunning service parameters", "The parameters used for the LongRunning service");
 	
@@ -430,7 +430,7 @@ static json_t *GetLongRunningResultsAsJSON (Service *service_p, const uuid_t job
 
 			if (result_p)
 				{
-					json_t *resource_json_p = GetResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, "Long Runner", result_p);
+					json_t *resource_json_p = GetDataResourceAsJSONByParts (PROTOCOL_INLINE_S, NULL, "Long Runner", result_p);
 
 					if (resource_json_p)
 						{
@@ -608,7 +608,7 @@ static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *p
 }
 
 
-static ParameterSet *IsFileForLongRunningService (Service * UNUSED_PARAM (service_p), Resource * UNUSED_PARAM (resource_p), Handler * UNUSED_PARAM (handler_p))
+static ParameterSet *IsFileForLongRunningService (Service * UNUSED_PARAM (service_p), DataResource * UNUSED_PARAM (resource_p), Handler * UNUSED_PARAM (handler_p))
 {
 	return NULL;
 }
