@@ -142,14 +142,14 @@ static const char *GetLongRunningServiceAlias (const Service *service_p);
 
 static const char *GetLongRunningServiceDescription (const Service *service_p);
 
-static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource *resource_p, UserDetails *user_p);
+static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource *resource_p, User *user_p);
 
 static void ReleaseLongRunningServiceParameters (Service *service_p, ParameterSet *params_p);
 
 static bool GetLongRunningServiceParameterTypesForNamedParameters (const Service *service_p, const char *param_name_s, ParameterType *pt_p);
 
 
-static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails *user_p, ProvidersStateTable *providers_p);
+static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, User *user_p, ProvidersStateTable *providers_p);
 
 static ParameterSet *IsFileForLongRunningService (Service *service_p, DataResource *resource_p, Handler *handler_p);
 
@@ -200,7 +200,7 @@ static ServiceMetadata *GetLongRunningServiceMetadata (Service *service_p);
 /*
  * API FUNCTIONS
  */
-ServicesArray *GetServices (UserDetails *user_p, GrassrootsServer *grassroots_p)
+ServicesArray *GetServices (User *user_p, GrassrootsServer *grassroots_p)
 {
 	Service *service_p = (Service *) AllocMemory (sizeof (Service));
 
@@ -362,7 +362,7 @@ static const char *GetLongRunningServiceAlias (const Service * UNUSED_PARAM (ser
 	return "example" SERVICE_GROUP_ALIAS_SEPARATOR "run";
 }
 
-static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), UserDetails * UNUSED_PARAM (user_p))
+static ParameterSet *GetLongRunningServiceParameters (Service *service_p, DataResource * UNUSED_PARAM (resource_p), User * UNUSED_PARAM (user_p))
 {
 	ParameterSet *param_set_p = AllocateParameterSet ("LongRunning service parameters", "The parameters used for the LongRunning service");
 	
@@ -533,7 +533,7 @@ static ServiceJobSet *GetServiceJobSet (Service *service_p, const uint32 num_job
 }
 
 
-static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, UserDetails * UNUSED_PARAM (user_p), ProvidersStateTable * UNUSED_PARAM (providers_p))
+static ServiceJobSet *RunLongRunningService (Service *service_p, ParameterSet *param_set_p, User * UNUSED_PARAM (user_p), ProvidersStateTable * UNUSED_PARAM (providers_p))
 {
 	const uint32 *num_tasks_p = NULL;
 
